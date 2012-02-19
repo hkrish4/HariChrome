@@ -1,0 +1,205 @@
+<html>
+<head>
+    <title>InvisibleHand Options</title>    
+  <style>
+    body {
+      background: #666156;
+      font-family: helvetica, arial, sans-serif;
+    }
+    a {
+      margin: 0 10px 0 10px;
+      color: #D6D6D6;
+      text-decoration: underline;
+      border: 0;
+    }
+    a:active {
+      color: #D6D6D6;
+      text-decoration: underline;
+      border: 0;
+    }
+    a:visited {
+      color: #D6D6D6;
+      text-decoration: underline;
+      border: 0;
+    }
+    a:hover {
+      color: #EBEBEB;
+      text-decoration: underline;
+    }
+   #wrapper {
+     margin: 0 auto;
+     width: 560px;
+   }
+   #main {
+     margin: 0 auto;
+     background-color: white;
+     margin: 20px;
+     padding: 35px;
+     font-size: 14px;
+
+     -webkit-border-radius: 15px;
+     -webkit-border-top-right-radius: 15px;
+     -webkit-border-bottom-left-radius: 15px;
+     -moz-border-radius: 15px;
+     -moz-border-radius-topright: 15px;
+     -moz-border-radius-bottomleft: 15px;
+     border-radius: 15px;
+     border-top-right-radius: 15px;
+     border-bottom-left-radius: 15px;
+
+     box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
+     -moz-box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
+     -webkit-box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
+   }
+   
+    #links {
+      margin-top: 40px;
+      color: #EEE;
+      text-align: center;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+    }
+   
+   #header h1 {
+     color: #EEE;
+     padding-left: 135px;
+     text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+   }
+   #header {
+     padding: 0px;
+     padding-top: 40px;
+   }
+   #logo {
+     top: 40px;
+     position: absolute;
+     float: left;
+   }
+   
+   input {
+     width: 45px;
+     float: right;
+   }
+   #save_wrapper {
+     margin: 20px 0 40px 0;
+   }
+   #checkbox_wrapper {
+     margin-left: 20px;
+   }
+   #save_button {
+     float: right;
+     width: 68px;
+   }
+   #save_button button {
+     width: 60px;
+   }
+   #save_status
+   {
+     width: 320px;
+     float: left;
+   }
+  </style>
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-21876973-5']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = 'https://ssl.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();      
+
+  </script>
+  
+  <script type="text/javascript" src="../lib/storage.js"></script>
+  
+  <script type="text/javascript">
+  
+  function checkboxesIds() {
+    return ['products-search-engines-enabled', 'products-ebay-enabled', 'flights-enabled', 'products-related-items-enabled'];
+  }
+  
+  function defaultOptions() {
+    // see also background.html:extensionOptions
+    return {'products-search-engines-enabled': true, 'products-ebay-enabled': true, 'flights-enabled': true, 'products-related-items-enabled': true};
+  }
+
+  function saveOptions() {
+    var options = {};
+    var optionsIds = checkboxesIds();
+    for (i in optionsIds) {
+      var optionId = optionsIds[i];
+      options[optionId] = document.getElementById(optionId).checked;
+      _gaq.push(['_trackEvent', 'option-' + optionId, options[optionId]]);
+    }
+    storage.store("extensionOptions", JSON.stringify(options));
+
+    // Update status to let user know options were saved.
+    var status = document.getElementById("save_status");
+    status.innerHTML = "Options Saved. <img src='http://www.getinvisiblehand.com/images/extension_options_tick.png'>";
+    setTimeout(function() {
+      status.innerHTML = "";
+    }, 1250);
+  }
+
+  function restoreOptions() {
+    var defaults = defaultOptions();
+    try {
+      var options = JSON.parse(storage.read("extensionOptions"));
+      if (!options) return;
+      for (i in defaults)
+        if (options[i] == undefined) options[i] = defaults[i];
+    } catch(e) {
+      var options = defaults;
+    }
+    var optionsIds = checkboxesIds();
+    for (i in optionsIds) {
+      var optionId = optionsIds[i];
+      document.getElementById(optionId).checked = options[optionId];
+    }    
+  }
+  </script>
+</head>
+
+<body onload="restoreOptions()">
+
+<div id="wrapper">
+  
+  <div id="header">
+    <img id="logo" src="../images/logo_optionspage.png"><h1>InvisibleHand Options</h1>
+  </div>
+  
+  <div id="main">
+    <div id="checkbox_wrapper">
+      <p>
+        <input type='checkbox' id='products-search-engines-enabled'>
+        Show product notifications on search engines
+      </p>
+      <p>
+        <input type='checkbox' id='products-ebay-enabled'>
+        Show eBay BuyItNow notifications
+      </p>
+      <p>
+        <input type='checkbox' id='flights-enabled'>
+        Show flight notifications
+      </p>
+      <p>
+        <input type='checkbox' id='products-related-items-enabled'>
+        Show related items
+      </p>
+    </div>
+    
+    <div id="save_wrapper">
+      <div id='save_status'></div>
+      <div id="save_button"><button onclick="saveOptions()">Save</button></div>
+    </div>
+    
+  </div>
+  
+  <div id="links">
+    <a href="http://www.getinvisiblehand.com/help/gettingstarted">Getting Started guide</a> | <a href="mailto:info@getinvisiblehand.com">Get in touch</a>
+  </div>
+</div>
+
+</body>
+</html>

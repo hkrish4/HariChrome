@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='ghfdjddpobpnemkmpifpceickjfngdpc'>
+    <updatecheck codebase='http://assets-ih.s3.amazonaws.com/' version='3.6.5' />
+  </app>
+</gupdate>

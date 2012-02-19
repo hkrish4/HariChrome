@@ -1,0 +1,79 @@
+/*@author Rob W, created on 16-17 September, on request for Stackoverflow (http://stackoverflow.com/q/7085454/938089)
+ * This script will calculate words. For the simplicity and efficiency,
+ * there's only one loop through a block of text.
+ * A 100% accuracy requires much more computing power, which is usually unnecessary
+ */
+
+
+var text = "I have a quick Ubuntu tip for you today. You’re on the command line and have an image in the directory that you’re currently in. How can you easily view this image without loading Nautilus, browsing to the directory, and opening it from there? It turns out that the answer is very simple.The default image viewer in Ubuntu is called Eye of Gnome. Using Eye of Gnome, you can quickly view the following images: ani, bmp, gif, ico, jpeg, pcx, png, pnm, ras, svg, tga, tiff, wbmp, xbm, and xpm.To run Eye of Gnome from the command line, simply run “eog”. So, if you have a file called image.jpg in your current directory, you can simply run the following to view it:eog image.jpg Now you never again have to wonder what that image is as you’re browsing around in Terminal.This tip will work for any distro running Gnome, such as Linux Mint.";
+
+var atLeast = 2; //show results with at least .. occurences
+var numWords = 5; //Show statistics for one to .. words
+var ignoreCase = true; //case-sensitive
+var REallowedChars = /[^a-zA-Z'-]+/g;
+ // RE pattern to select valid characters. Invalid characters are replaced by a whitespace
+
+//Prepare key map
+var keys = [,]; //"keys[0] = undefined", a word boundary with length zero is empty
+var results = [];
+numWords++;//for human logic, we start counting at 1 instead of 0
+for(var i=1; i<=numWords; i++){
+    keys.push({});
+}
+
+//Strip away all irrelevant characters
+text = text.replace(REallowedChars, " ").replace(/^\s+/,"").replace(/\s+$/,"");
+
+//create a mapping
+if(ignoreCase) text = text.toLowerCase();
+text = text.split(/\s+/);
+for(var i=0,textlen=text.length,s; i<textlen; i++){
+    s = text[i];
+    keys[1][s] = (keys[1][s] || 0) + 1;
+    for(var j=2; j<=numWords; j++){
+        if(i+j <= textlen){
+            s += " " + text[i+j-1];
+            keys[j][s] = (keys[j][s] || 0) + 1;
+        } else break;
+    }
+}
+
+//prepares results for advanced analysis
+for(var k=1; k<=numWords; k++){
+    results[k] = [];
+    var key = keys[k];
+    for(var i in key){
+        if(key[i] >= atLeast) results[k].push({"word":i, "count":key[i]});
+    }
+}
+
+//result parsing
+var outputHTML = [];//Going to hold data for a table, innerHTML is much faster thus effective, compared to DOM
+
+var f_sortAscending = function(x,y){return y.count - x.count};
+for(var k=1; k<numWords; k++){
+    results[k].sort(f_sortAscending);//sorts results
+    
+    //Customize your output, I will provide a simple yet solid example
+    var words = results[k];
+    if(words.length) outputHTML.push('<td colSpan="3" class="num-words-header">'+k+' word'+(k==1?"":"s")+'</td>');
+    for(var i=0,len=words.length; i<len; i++){
+        
+        //Characters are validated. No chance on XSS
+        outputHTML.push("<td>" + words[i].word + "</td><td>" +
+           words[i].count + "</td><td>" +
+           Math.round(words[i].count/textlen*10000)/100 + "%</td>");
+           // textlen defined at the top
+           // The relative occurence has a precision of 2 digits.
+    }
+}
+outputHTML = "<table id=\"wordAnalysis\"><thead><tr><td>Phrase</td><td>Count</td><td>Relativity</td></tr></thead><tbody><tr>"+outputHTML.join("</tr><tr>")+"</tr></tbody></table>";
+document.getElementById("RobW-sample").innerHTML = outputHTML;
+/*
+CSS:
+#wordAnalysis td{padding:1px 3px 1px 5px}
+.num-words-header{font-weight:bold;border-top:1px solid #000}
+
+HTML:
+<div id="#RobW-sample"></div>
+*/​
